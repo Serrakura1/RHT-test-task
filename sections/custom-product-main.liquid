@@ -95,11 +95,13 @@
               <div class="custom-product-main__gallery">
                 <div class="swiper mainProductGallery-{{ forloop.index }}">
                   <div class="swiper-wrapper">
-                    <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
-                      <div class="custom-product-main__gallery-image">
-                        {{ product.featured_image | image_url: width: 800 | image_tag }}
+                    {% comment %}
+                      <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
+                        <div class="custom-product-main__gallery-image">
+                          {{ product.featured_image | image_url: width: 800 | image_tag }}
+                        </div>
                       </div>
-                    </div>
+                    {% endcomment %}
                     {% for image in variant.metafields.custom.variants_gallery.value %}
                       <div class="swiper-slide" data-color="{{ image.alt | downcase }}">
                         <div class="custom-product-main__gallery-image">
@@ -116,11 +118,13 @@
               <div class="custom-product-thumbnails__gallery">
                 <div class="swiper thumbProductGallery-{{ forloop.index }}">
                   <div class="swiper-wrapper">
-                    <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
-                      <div class="custom-product-thumbnails__gallery-image">
-                        {{ product.featured_image | image_url: width: 400 | image_tag }}
+                    {% comment %}
+                      <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
+                        <div class="custom-product-thumbnails__gallery-image">
+                          {{ product.featured_image | image_url: width: 400 | image_tag }}
+                        </div>
                       </div>
-                    </div>
+                    {% endcomment %}
                     {% for image in variant.metafields.custom.variants_gallery.value %}
                       <div class="swiper-slide">
                         <div class="custom-product-thumbnails__gallery-image">
