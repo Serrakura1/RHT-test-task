@@ -54,7 +54,7 @@
       ],
       "name": "Custom Product Main",
       "settings": {
-        "desk_gallery_qty_slides": 3,
+        "desk_gallery_qty_slides": 1,
         "tablet_gallery_qty_slides": 2,
         "mobile_gallery_qty_slides": 1,
         "desktop_pagination": true,
