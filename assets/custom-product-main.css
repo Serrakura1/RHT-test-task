@@ -74,6 +74,12 @@
   padding: 0 16px;
 }
 
+.custom-product-main-variants {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .custom-product-main-variants__circle {
   display: flex !important;
   align-items: center;

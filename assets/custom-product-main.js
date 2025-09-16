@@ -1,18 +1,61 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Variants
-  document.querySelectorAll(".custom-product-main-variants__circle").forEach((circle) => {
+  function showVariantGallery(variantId) {
+    if (!variantId) return;
+
+    document.querySelectorAll(".custom-product__gallery-wrap").forEach(function (g) {
+      g.style.display = "none";
+    });
+
+    var gallery = document.querySelector('.custom-product__gallery-wrap[data-variant="' + variantId + '"]');
+    if (gallery) gallery.style.display = "flex";
+
+    if (window.swipers && window.swipers[variantId]) {
+      // quick timeout to let dom reload display property
+      setTimeout(function () {
+        try {
+          window.swipers[variantId].main.update();
+          window.swipers[variantId].thumb.update();
+        } catch (e) {
+          // ignore
+        }
+      }, 50);
+    }
+  }
+
+  document.querySelectorAll(".custom-product-main-variants__circle").forEach(function (circle) {
     circle.addEventListener("click", function () {
-      var targetHandle = this.dataset.product || "{{ main_handle }}";
+      var targetVariantId = this.dataset.variantId;
+      if (!targetVariantId) return;
 
-      document.querySelectorAll(".custom-product__gallery-wrap").forEach((gallery) => (gallery.style.display = "none"));
+      showVariantGallery(targetVariantId);
 
-      var targetGallery = document.querySelector(`.custom-product__gallery-wrap[data-product="${targetHandle}"]`);
-      if (targetGallery) targetGallery.style.display = "flex";
-
-      document.querySelectorAll(".custom-product-main-variants__circle").forEach((c) => c.classList.remove("active"));
+      document.querySelectorAll(".custom-product-main-variants__circle").forEach(function (c) {
+        c.classList.remove("active");
+      });
       this.classList.add("active");
+
+      var variantSelect = document.querySelector('select[name="id"]');
+      if (variantSelect) {
+        variantSelect.value = targetVariantId;
+        variantSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      } else {
+        // возможно варианты реализованы как input[type="radio"]
+        var radio = document.querySelector('input[name="id"][value="' + targetVariantId + '"]');
+        if (radio) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
     });
   });
+
+  var active = document.querySelector(".custom-product-main-variants__circle.active");
+  if (active && active.dataset.variantId) {
+    showVariantGallery(active.dataset.variantId);
+  } else {
+    var sel = document.querySelector('select[name="id"]');
+    if (sel) showVariantGallery(sel.value);
+  }
 
   function formatMoney(cents) {
     const amount = (cents / 100).toFixed(2);

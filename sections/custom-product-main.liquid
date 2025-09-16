@@ -49,51 +49,61 @@
       {%- assign main_handle = product.handle -%}
 
       <div class="custom-product-galleries">
-        <!-- Gallery of main product -->
-        <div class="custom-product__gallery-wrap" data-product="{{ main_handle }}">
-          <div class="custom-product-main__gallery">
-            <div class="swiper mainProductGallery-main">
-              <div class="swiper-wrapper">
-                {% for media_item in product.media %}
-                  <div class="swiper-slide" data-color="{{ media_item.alt | downcase }}">
-                    <div class="custom-product-main__gallery-image">
-                      {{ media_item | media_tag: image_size: '800x' }}
+        {% if product.variants.size == 0 %}
+          <!-- Gallery of main product -->
+          <div class="custom-product__gallery-wrap" data-product="{{ main_handle }}">
+            <div class="custom-product-main__gallery">
+              <div class="swiper mainProductGallery-main">
+                <div class="swiper-wrapper">
+                  {% for media_item in product.media %}
+                    <div class="swiper-slide" data-color="{{ media_item.alt | downcase }}">
+                      <div class="custom-product-main__gallery-image">
+                        {{ media_item | media_tag: image_size: '800x' }}
+                      </div>
                     </div>
-                  </div>
-                {% endfor %}
+                  {% endfor %}
+                </div>
+                <div class="swiper-pagination"></div>
               </div>
-              <div class="swiper-pagination"></div>
+              <div class="swiper-button-next"></div>
+              <div class="swiper-button-prev"></div>
             </div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-          </div>
-          <div class="custom-product-thumbnails__gallery">
-            <div class="swiper thumbProductGallery-main">
-              <div class="swiper-wrapper">
-                {% for media_item in product.media %}
-                  <div class="swiper-slide">
-                    <div class="custom-product-thumbnails__gallery-image">
-                      {{ media_item | media_tag: image_size: '400x' }}
+            <div class="custom-product-thumbnails__gallery">
+              <div class="swiper thumbProductGallery-main">
+                <div class="swiper-wrapper">
+                  {% for media_item in product.media %}
+                    <div class="swiper-slide">
+                      <div class="custom-product-thumbnails__gallery-image">
+                        {{ media_item | media_tag: image_size: '400x' }}
+                      </div>
                     </div>
-                  </div>
-                {% endfor %}
+                  {% endfor %}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Gallery siblings (hidden by default) -->
-        {% if product.metafields.custom.product_siblings != blank %}
-          {% for sibling in product.metafields.custom.product_siblings.value %}
-            {% assign sibling_product = all_products[sibling.handle] %}
-            <div class="custom-product__gallery-wrap" data-product="{{ sibling_product.handle }}" style="display:none;">
+        {% else %}
+          <!-- Gallery variants -->
+          {% for variant in product.variants %}
+            <div
+              class="custom-product__gallery-wrap"
+              data-variant="{{ variant.id }}"
+              {% if forloop.index0 != 0 %}
+                style="display:none;"
+              {% endif %}
+            >
               <div class="custom-product-main__gallery">
                 <div class="swiper mainProductGallery-{{ forloop.index }}">
                   <div class="swiper-wrapper">
-                    {% for media_item in sibling_product.media %}
-                      <div class="swiper-slide" data-color="{{ media_item.alt | downcase }}">
+                    <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
+                      <div class="custom-product-main__gallery-image">
+                        {{ product.featured_image | image_url: width: 800 | image_tag }}
+                      </div>
+                    </div>
+                    {% for image in variant.metafields.custom.variants_gallery.value %}
+                      <div class="swiper-slide" data-color="{{ image.alt | downcase }}">
                         <div class="custom-product-main__gallery-image">
-                          {{ media_item | media_tag: image_size: '800x' }}
+                          {{ image | media_tag: image_size: '800x' }}
                         </div>
                       </div>
                     {% endfor %}
@@ -106,10 +116,15 @@
               <div class="custom-product-thumbnails__gallery">
                 <div class="swiper thumbProductGallery-{{ forloop.index }}">
                   <div class="swiper-wrapper">
-                    {% for media_item in sibling_product.media %}
+                    <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
+                      <div class="custom-product-thumbnails__gallery-image">
+                        {{ product.featured_image | image_url: width: 400 | image_tag }}
+                      </div>
+                    </div>
+                    {% for image in variant.metafields.custom.variants_gallery.value %}
                       <div class="swiper-slide">
                         <div class="custom-product-thumbnails__gallery-image">
-                          {{ media_item | media_tag: image_size: '400x' }}
+                          {{ image | media_tag: image_size: '400x' }}
                         </div>
                       </div>
                     {% endfor %}
@@ -362,34 +377,53 @@
                 <div class="custom-product-main-variants">
                   {% if product.metafields.shopify['color-pattern'].value != blank %}
                     {% for color in product.metafields.shopify['color-pattern'].value %}
+                      {% assign vid = '' %}
+                      {% for variant in product.variants %}
+                        {% if variant.option1 == color.label
+                          or variant.option2 == color.label
+                          or variant.option3 == color.label
+                        %}
+                          {% assign vid = variant.id %}
+                          {% break %}
+                        {% endif %}
+                      {% endfor %}
+                      {% if vid == '' %}
+                        {% assign vid = product.first_available_variant.id %}
+                      {% endif %}
+
                       <div
-                        class="custom-product-main-variants__circle active"
+                        class="custom-product-main-variants__circle {% if forloop.index0 == 0 %}active{% endif %}"
                         data-color="{{ color.label | downcase }}"
                         data-product="{{ product.handle }}"
-                        data-variant-id="{{ product.first_available_variant.id }}"
+                        data-variant-id="{{ vid }}"
                         style="background-color:{{ color.color }}"
+                        role="button"
+                        tabindex="0"
                       ></div>
                     {% endfor %}
                   {% endif %}
                 </div>
-                <div class="custom-product-siblings-variants">
-                  {% if product.metafields.custom.product_siblings != blank %}
-                    {% for sibling in product.metafields.custom.product_siblings.value %}
-                      {% assign sibling_product = all_products[sibling.handle] %}
-                      {% if sibling_product.metafields.shopify['color-pattern'] != blank %}
-                        {% for sibling_color in sibling_product.metafields.shopify['color-pattern'].value %}
-                          <div
-                            class="custom-product-main-variants__circle"
-                            data-product="{{ sibling_product.handle }}"
-                            data-variant-id="{{ sibling_product.first_available_variant.id }}"
-                            data-color="{{ sibling_color.label | downcase }}"
-                            style="background-color:{{ sibling_color.color }}"
-                          ></div>
-                        {% endfor %}
-                      {% endif %}
-                    {% endfor %}
-                  {% endif %}
-                </div>
+
+                {% if product.metafields.custom.product_siblings != blank %}
+                  <div class="custom-product-siblings-variants">
+                    {% if product.metafields.custom.product_siblings != blank %}
+                      {% for sibling in product.metafields.custom.product_siblings.value %}
+                        {% assign sibling_product = all_products[sibling.handle] %}
+                        {% if sibling_product.metafields.shopify['color-pattern'] != blank %}
+                          {% for sibling_color in sibling_product.metafields.shopify['color-pattern'].value %}
+                            <div
+                              class="custom-product-main-variants__circle"
+                              data-product="{{ sibling_product.handle }}"
+                              data-variant-id="{{ sibling_product.first_available_variant.id }}"
+                              data-color="{{ sibling_color.label | downcase }}"
+                              style="background-color:{{ sibling_color.color }}"
+                            ></div>
+                          {% endfor %}
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                {% endif %}
               </div>
             {%- when 'accordion' -%}
               {% if product.metafields.custom.product_accordeon != blank %}
@@ -460,8 +494,8 @@
     });
     swipers["{{ main_handle }}"] = { main: mainSwiper, thumb: thumbMain };
 
-    // Siblings sliders
-    {% for sibling in product.metafields.custom.product_siblings.value %}
+    // Variants* sliders
+    {% for variant in product.variants %}
       var thumb{{ forloop.index }} = new Swiper('.thumbProductGallery-{{ forloop.index }}', {
         slidesPerView: 3,
         spaceBetween: 10,
@@ -496,7 +530,7 @@
           },
         },
       });
-      swipers["{{ all_products[sibling.handle].handle }}"] = {
+      swipers["{{ variant.id }}"] = {
         main: main{{ forloop.index }},
         thumb: thumb{{ forloop.index }},
       };
