@@ -22,6 +22,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentVariantId = urlParams.get("variant");
+
+  let targetCircle;
+
+  if (currentVariantId) {
+    targetCircle = document.querySelector(`.custom-product-main-variants__circle[data-variant-id="${currentVariantId}"]`);
+  }
+
+  if (!targetCircle) {
+    targetCircle = document.querySelector(".custom-product-main-variants__circle");
+  }
+
+  if (targetCircle) {
+    document.querySelectorAll(".custom-product-main-variants__circle").forEach((c) => c.classList.remove("active"));
+    targetCircle.classList.add("active");
+  }
+
   document.querySelectorAll(".custom-product-main-variants__circle").forEach(function (circle) {
     circle.addEventListener("click", function () {
       var targetVariantId = this.dataset.variantId;
@@ -39,7 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
         variantSelect.value = targetVariantId;
         variantSelect.dispatchEvent(new Event("change", { bubbles: true }));
       } else {
-        // возможно варианты реализованы как input[type="radio"]
         var radio = document.querySelector('input[name="id"][value="' + targetVariantId + '"]');
         if (radio) {
           radio.checked = true;
