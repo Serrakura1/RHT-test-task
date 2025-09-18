@@ -3,10 +3,14 @@
   I do not clutter the code with comments.
   This is done only for the purpose of testing the assignment.
 
-  In this task, I chose a method that I often use to solve the problem
+  {{ In this task, I chose a method that I often use to solve the problem
   of overflowing options in order to demonstrate my approach.
   Specifically, there are not many options here, but I decided to complete
-  the task in the way I am accustomed to.
+  the task in the way I am accustomed to. }}
+
+  ⬆ that was old variant with metafields
+
+  Now realized by casual variants
 {% endcomment %}
 
 {{ 'custom-product-main.css' | asset_url | stylesheet_tag }}
@@ -96,11 +100,13 @@
                 <div class="swiper mainProductGallery-{{ forloop.index }}">
                   <div class="swiper-wrapper">
                     {% comment %}
-                      <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
-                        <div class="custom-product-main__gallery-image">
-                          {{ product.featured_image | image_url: width: 800 | image_tag }}
-                        </div>
-                      </div>
+                      When user open product page he will get product.featured_image
+                      to no feeling that he clicked on the wrong product.
+                       <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
+                         <div class="custom-product-main__gallery-image">
+                           {{ product.featured_image | image_url: width: 800 | image_tag }}
+                         </div>
+                       </div>
                     {% endcomment %}
                     {% for image in variant.metafields.custom.variants_gallery.value %}
                       <div class="swiper-slide" data-color="{{ image.alt | downcase }}">
@@ -119,11 +125,13 @@
                 <div class="swiper thumbProductGallery-{{ forloop.index }}">
                   <div class="swiper-wrapper">
                     {% comment %}
-                      <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
-                        <div class="custom-product-thumbnails__gallery-image">
-                          {{ product.featured_image | image_url: width: 400 | image_tag }}
-                        </div>
-                      </div>
+                      When user open product page he will get product.featured_image
+                      to no feeling that he clicked on the wrong product.
+                       <div class="swiper-slide" data-color="{{ product.featured_image.alt | downcase }}">
+                         <div class="custom-product-thumbnails__gallery-image">
+                           {{ product.featured_image | image_url: width: 400 | image_tag }}
+                         </div>
+                       </div>
                     {% endcomment %}
                     {% for image in variant.metafields.custom.variants_gallery.value %}
                       <div class="swiper-slide">
